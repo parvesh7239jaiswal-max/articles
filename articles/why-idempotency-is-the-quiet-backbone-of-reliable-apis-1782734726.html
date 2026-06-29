@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Why Idempotency Is the Quiet Backbone of Reliable APIs</title></head>
+<body>
+<h1>Why Idempotency Is the Quiet Backbone of Reliable APIs</h1>
+<p>Every distributed system eventually runs into the same uncomfortable truth: the network lies. A request that times out may have already succeeded on the server. A client that never sees a response will, quite reasonably, try again. Without a plan for that retry, "try again" quietly becomes "charge the customer twice."</p>
+<h2>The problem in one sentence</h2>
+<p>When a caller can't tell whether a request was processed, it has to retry — and retries are only safe if the server can recognize a repeat and refuse to do the work twice. That property is called <em>idempotency</em>: making the same call once or five times leaves the system in the same state.</p>
+<h2>Reads are easy, writes are where it hurts</h2>
+<p>Fetching a resource is naturally idempotent — asking for the same record twice changes nothing. The danger lives in writes: creating an order, transferring money, sending an email. These are the operations where a duplicate isn't just noise, it's a real-world side effect that someone notices.</p>
+<h2>The idempotency key pattern</h2>
+<p>The most durable fix is also the simplest. The client generates a unique key for each logical operation — a UUID is fine — and sends it with the request, usually as an <code>Idempotency-Key</code> header. The server stores the key alongside the result of the first successful call. If the same key arrives again, the server skips the work and replays the stored response.</p>
+<p>Three rules make this reliable:</p>
+<ul>
+<li><strong>Persist the key before doing the work</strong>, inside the same transaction as the side effect, so a crash can't leave a side effect without its key.</li>
+<li><strong>Return the original response</strong> on a repeat, not a fresh one — the caller should get exactly what it would have gotten the first time.</li>
+<li><strong>Give keys a sensible lifetime.</strong> Twenty-four hours covers almost every retry storm without letting the table grow forever.</li>
+</ul>
+<h2>Why not just dedupe by content?</h2>
+<p>Teams sometimes try to detect duplicates by hashing the request body. It feels clever, but it breaks the moment two genuinely different requests happen to look identical, or one legitimately differs by a timestamp. An explicit key sidesteps all of that: the client declares intent, and the server honors it.</p>
+<h2>The payoff</h2>
+<p>Once idempotency is in place, retries stop being scary. Clients can retry aggressively, queues can redeliver, and load balancers can fail over — all without fear of double effects. You stop writing defensive special cases and start trusting your own system under failure, which is the whole point of building one.</p>
+<p>Idempotency rarely shows up in a demo. It shows up at 3 a.m. when a flaky connection retries a payment and nothing bad happens. That silence is the feature.</p>
+</body>
+</html>
