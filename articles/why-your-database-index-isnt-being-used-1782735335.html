@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Why Your Database Index Isn't Being Used</title></head>
+<body>
+<h1>Why Your Database Index Isn't Being Used</h1>
+<p>You added an index, the query is still slow, and the database seems to be ignoring all your careful work. This is one of the most common sources of confusion in backend development, and the reasons are surprisingly knowable.</p>
+<h2>The optimizer gets a vote</h2>
+<p>An index is an offer, not a command. The query planner weighs the cost of using it against the cost of a full scan, and on a small or low-variety table a sequential scan is often genuinely faster. If your test table has a thousand rows, don't be surprised when the index sits unused — there simply isn't enough data for it to pay off.</p>
+<h2>Functions on the column kill the index</h2>
+<p>The classic mistake: <code>WHERE lower(email) = '...'</code> or <code>WHERE date(created_at) = '...'</code>. The moment you wrap an indexed column in a function, the plain index on that column no longer matches, and the planner falls back to scanning. The fix is either an expression index on <code>lower(email)</code>, or rewriting the query to compare the raw column against a range.</p>
+<h2>Leading-column rules for composite indexes</h2>
+<p>A composite index on <code>(a, b)</code> can serve queries filtering on <code>a</code>, or <code>a AND b</code>, but not <code>b</code> alone — the index is sorted by <code>a</code> first. People build a multi-column index and then filter only on the second column, then wonder why it's skipped. Order the columns by how you actually query them, most-selective and most-frequently-filtered first.</p>
+<h2>Type mismatches and stale statistics</h2>
+<p>Comparing a <code>bigint</code> column to a string literal can force an implicit cast that defeats the index. And if the table's statistics are stale, the planner may badly misjudge how many rows a condition will match. Run <code>EXPLAIN ANALYZE</code>, read what the planner actually decided, and refresh statistics if its row estimates are wildly off.</p>
+<p>The habit that fixes all of this is the same: stop guessing, run <code>EXPLAIN</code>, and let the database tell you why it chose what it chose. The answer is almost always in the plan.</p>
+</body>
+</html>
