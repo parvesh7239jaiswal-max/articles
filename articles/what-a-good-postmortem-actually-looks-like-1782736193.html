@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>What a Good Postmortem Actually Looks Like</title></head>
+<body>
+<h1>What a Good Postmortem Actually Looks Like</h1>
+<p>Something broke, customers noticed, and now someone has to write it up. The difference between a postmortem that makes a team stronger and one that quietly makes everyone defensive comes down to a few deliberate choices.</p>
+<h2>Blameless is a mechanism, not a mood</h2>
+<p>"Blameless" doesn't mean pretending nobody made a mistake. It means assuming that the people involved acted reasonably given what they knew at the time, and then asking why the system allowed a reasonable action to cause harm. The moment a postmortem turns into "who pushed the bad change," people start hiding details — and the details are the entire value.</p>
+<h2>A timeline beats a narrative</h2>
+<p>The strongest postmortems are built on a precise, timestamped timeline: when the change went out, when the first alert fired, when a human noticed, when mitigation started, when it was resolved. A timeline exposes the real gaps — often it's not the bug that hurt, it's the forty minutes between the failure and anyone realizing it. That detection gap is usually the most valuable thing you'll learn.</p>
+<h2>Action items that someone owns</h2>
+<p>A postmortem that ends in vague aspirations ("we should test more") changes nothing. Each finding should produce a concrete action item with an owner and a due date, and ideally at least one of them should make the <em>class</em> of problem impossible rather than just patching this instance. Add a guardrail, not just a fix.</p>
+<h2>The honest questions</h2>
+<p>Three questions surface most of the learning: What made this hard to detect? What made it hard to diagnose? What would have made it impossible? If your write-up answers those plainly, it doesn't need to be long. A short, honest postmortem that the team actually reads beats an exhaustive one that gets filed and forgotten.</p>
+<p>The goal isn't to document the failure. It's to spend the failure — to convert a bad afternoon into a system that can't fail the same way twice.</p>
+</body>
+</html>
