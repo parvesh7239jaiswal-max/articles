@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Cache Invalidation: The Hard Part Nobody Warns You About</title></head>
+<body>
+<h1>Cache Invalidation: The Hard Part Nobody Warns You About</h1>
+<p>Adding a cache feels like free performance. You put a layer in front of the slow thing, reads get fast, and everyone is happy — until the data changes and the cache keeps serving the old version. Caching is easy. Cache invalidation is the part that quietly ruins your afternoon.</p>
+<h2>The two hard problems</h2>
+<p>The old joke says there are only two hard problems in computer science: cache invalidation, naming things, and off-by-one errors. The cache one is hard because correctness and performance pull in opposite directions. The longer you keep data, the faster you are and the more wrong you risk being. Every caching decision is really a decision about how stale you can afford to be.</p>
+<h2>Pick an invalidation strategy on purpose</h2>
+<p>There are only a few honest options, and you should choose deliberately rather than drift into one:</p>
+<ul>
+<li><strong>TTL (time to live):</strong> simple, predictable, and tolerant of being slightly stale. Best default for data that doesn't need to be exact.</li>
+<li><strong>Write-through / explicit invalidation:</strong> update or delete the cache entry when the source changes. Accurate, but every write path now has to remember the cache, and forgetting one is where bugs live.</li>
+<li><strong>Versioned keys:</strong> bake a version or timestamp into the cache key so a new version simply misses and repopulates. No deletion needed — old entries age out on their own.</li>
+</ul>
+<h2>The traps</h2>
+<p>Two failure modes show up again and again. The <strong>thundering herd</strong>: a popular key expires, a thousand requests miss at once, and they all stampede the database together — mitigate with a short lock or "stale-while-revalidate." And the <strong>stale-forever bug</strong>: an invalidation that silently fails leaves a wrong value cached until its TTL, which is exactly why a TTL is worth keeping even when you also invalidate explicitly.</p>
+<p>The mental model that helps: treat the cache as a hint that can be wrong, never as the source of truth. Design so that a missing or stale entry degrades gracefully into a correct (if slower) answer, and most caching disasters become non-events.</p>
+</body>
+</html>
